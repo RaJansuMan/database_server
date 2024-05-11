@@ -103,10 +103,25 @@ class ProtocolHandler(object):
         if isinstance(data, str):
             data = data.encode('utf-8')
             buf.write('+%s\r\n' % data)
-        if isinstance(data, bytes):
-            buf.write(':%s\r\n%s\r\n' % (len(data), data))
-        if isinstance(data,Error):
-            buf.write()
+        elif isinstance(data, bytes):
+            buf.write('$%s\r\n%s\r\n' % (len(data), data))
+        elif isinstance(data, int):
+            buf.write(':%s\r\n' % data)
+        elif isinstance(data, Error):
+            buf.write('-%s\r\n' % error.message)
+        elif isinstance(data, (list, tuple)):
+            buf.write('*%s\r\n' % len(data))
+            for item in data:
+                self._write(buf, item)
+        elif isinstance(data, dict):
+            buf.write('%%%s\r\n' % len(data))
+            for key in data:
+                self._write(buf, key)
+                self._write(buf, data[key])
+        elif data is None:
+            buf.write('$-1\r\n')
+        else:
+            raise CommandError('Unrecognized type %s' % type(data))
 
 
 class Server(object):
@@ -115,10 +130,20 @@ class Server(object):
         self._server = StreamServer(
             (host, port),
             self.connection_handler,
-            spawn=self.pool
-        )
+            spawn=self._pool)
         self._protocol = ProtocolHandler()
         self._kv = {}
+        self._commands = self.get_commands()
+
+    def get_commands(self):
+        return {
+            'GET': self.get,
+            'SET': self.set,
+            'DELETE': self.delete,
+            'FlUSH': self.flush,
+            'MGET': self.mget,
+            'MSET': self.mset
+        }
 
     def connection_handler(self, conn, address):
         socket_file = conn.makefile('rwb')
@@ -134,8 +159,21 @@ class Server(object):
             except CommandError as exc:
                 resp = Error(exc.args[0])
 
-    def get_response(self):
-        pass
+    def get_response(self, data):
+        if not isinstance(data, list):
+            try:
+                data = data.split()
+            except:
+                raise CommandError('Request must be list or simple string')
+
+        if not data:
+            raise CommandError('Missing Command')
+
+        command = data[0].uppper()
+        if command not in self._commands:
+            raise CommandError(f'Unrecognized command : {command}')
+
+        return self._commands[command](*data[1:])
 
     def run(self):
         self._server.serve_forever()
