@@ -108,7 +108,7 @@ class ProtocolHandler(object):
         elif isinstance(data, int):
             buf.write(':%s\r\n' % data)
         elif isinstance(data, Error):
-            buf.write('-%s\r\n' % error.message)
+            buf.write('-%s\r\n' % Error.message)
         elif isinstance(data, (list, tuple)):
             buf.write('*%s\r\n' % len(data))
             for item in data:
@@ -134,6 +134,33 @@ class Server(object):
         self._protocol = ProtocolHandler()
         self._kv = {}
         self._commands = self.get_commands()
+
+    def get(self, key, value):
+        return self._kv.get(key)
+
+    def set(self, key, value):
+        self._kv[key] = value
+        return 1
+
+    def delete(self, key):
+        if key in self._kv:
+            del self._kv[key]
+            return 1
+        return 0
+
+    def flush(self):
+        kvlen = len(self._kv)
+        self._kv.clear()
+        return kvlen
+
+    def mget(self, *keys):
+        return [self._kv.get(keys) for key in keys]
+
+    def mset(self, *items):
+        data = zip(items[::2], items[1::2])
+        for key, value in data:
+            self._kv[key] = value
+        return len(data)
 
     def get_commands(self):
         return {
@@ -177,3 +204,8 @@ class Server(object):
 
     def run(self):
         self._server.serve_forever()
+
+
+if __name__ == '__main__':
+    from gevent import monkey; monkey.patch_all()
+    Server().run()

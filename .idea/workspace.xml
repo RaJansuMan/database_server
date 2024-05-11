@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="770a7a95-27a8-4cdd-a92d-3dd1c759c560" name="Changes" comment="read protocol done">
+    <list default="true" id="770a7a95-27a8-4cdd-a92d-3dd1c759c560" name="Changes" comment="handling data">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/database_server.py" afterDir="false" />
     </list>
@@ -96,13 +96,22 @@
       <option name="project" value="LOCAL" />
       <updated>1715441495065</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="handling data">
+      <option name="closed" value="true" />
+      <created>1715445514021</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1715445514021</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="basic server structure" />
     <MESSAGE value="handled request protocol" />
     <MESSAGE value="read protocol done" />
-    <option name="LAST_COMMIT_MESSAGE" value="read protocol done" />
+    <MESSAGE value="handling data" />
+    <option name="LAST_COMMIT_MESSAGE" value="handling data" />
   </component>
 </project>
