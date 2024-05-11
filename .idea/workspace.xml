@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="770a7a95-27a8-4cdd-a92d-3dd1c759c560" name="Changes" comment="handling data">
+    <list default="true" id="770a7a95-27a8-4cdd-a92d-3dd1c759c560" name="Changes" comment="server done">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/database_server.py" afterDir="false" />
     </list>
@@ -13,6 +13,13 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -20,7 +27,9 @@
   &quot;associatedIndex&quot;: 1
 }</component>
   <component name="ProjectId" id="2gCLKFrjJE6dOGdK9iD4f013WM2" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -104,7 +113,15 @@
       <option name="project" value="LOCAL" />
       <updated>1715445514021</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="server done">
+      <option name="closed" value="true" />
+      <created>1715447755320</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1715447755320</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -112,6 +129,7 @@
     <MESSAGE value="handled request protocol" />
     <MESSAGE value="read protocol done" />
     <MESSAGE value="handling data" />
-    <option name="LAST_COMMIT_MESSAGE" value="handling data" />
+    <MESSAGE value="server done" />
+    <option name="LAST_COMMIT_MESSAGE" value="server done" />
   </component>
 </project>

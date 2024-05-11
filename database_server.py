@@ -50,12 +50,12 @@ Error = namedtuple('Error', ('message',))
 class ProtocolHandler(object):
     def __init__(self):
         self.handlers = {
-            '+': self.handle_simple_string,
-            '-': self.handle_error,
-            ':': self.handle_integer,
-            '$': self.handle_string,
-            '*': self.handle_array,
-            '%': self.handle_dict}
+            b'+': self.handle_simple_string,
+            b'-': self.handle_error,
+            b':': self.handle_integer,
+            b'$': self.handle_string,
+            b'*': self.handle_array,
+            b'%': self.handle_dict}
 
     def handle_request(self, socket_file):
         first_byte = socket_file.read(1)
@@ -67,33 +67,33 @@ class ProtocolHandler(object):
             raise CommandError('bad request')
 
     def handle_simple_string(self, socket_file):
-        return socket_file.readline().rstrip('\r\n')
+        return str(socket_file.readline().decode('utf-8')).rstrip('\r\n')
 
     def handle_error(self, socket_file):
-        return Error(socket_file.readline().rstrip('\r\n'))
+        return Error(str(socket_file.readline().decode('utf-8')).rstrip('\r\n'))
 
     def handle_integer(self, socket_file):
-        return int(socket_file.readline().rstrip('\r\n'))
+        return int(str(socket_file.readline().decode('utf-8')).rstrip('\r\n'))
 
     def handle_string(self, socket_file):
-        length = int(socket_file.readline().rstrip('\r\n'))
+        length = int(str(socket_file.readline().decode('utf-8')).rstrip('\r\n'))
         if length == -1:
             return None
         length += 2
         return socket_file.read(length)[:-2]
 
     def handle_array(self, socket_file):
-        num_elements = int(socket_file.readline().rstrip('\r\n'))
+        num_elements = int(str(socket_file.readline().decode('utf-8')).rstrip('\r\n'))
         return [self.handle_request(socket_file) for _ in range(num_elements)]
 
     def handle_dict(self, socket_file):
-        num_items = int(socket_file.readline().rstrip('\r\n'))
+        num_items = int(str(socket_file.readline().decode('utf-8')).rstrip('\r\n'))
         elements = [self.handle_request(socket_file)
                     for _ in range(num_items * 2)]
         return dict(zip(elements[::2], elements[1::2]))
 
     def write_response(self, socket_file, data):
-        buf = BytesIO
+        buf = BytesIO()
         self._write(buf, data)
         buf.seek(0)
         socket_file.write(buf.getvalue())
@@ -101,25 +101,24 @@ class ProtocolHandler(object):
 
     def _write(self, buf, data):
         if isinstance(data, str):
-            data = data.encode('utf-8')
-            buf.write('+%s\r\n' % data)
+            buf.write(f'+{data}\r\n'.encode('utf-8'))
         elif isinstance(data, bytes):
-            buf.write('$%s\r\n%s\r\n' % (len(data), data))
+            buf.write(f'${len(data)}\r\n{data}\r\n'.encode('utf-8'))
         elif isinstance(data, int):
-            buf.write(':%s\r\n' % data)
+            buf.write(f':{data}\r\n'.encode('utf-8'))
         elif isinstance(data, Error):
-            buf.write('-%s\r\n' % Error.message)
+            buf.write(f'-{Error.message}\r\n'.encode('utf-8'))
         elif isinstance(data, (list, tuple)):
-            buf.write('*%s\r\n' % len(data))
+            buf.write(f'*{len(data)}\r\n'.encode('utf-8'))
             for item in data:
                 self._write(buf, item)
         elif isinstance(data, dict):
-            buf.write('%%%s\r\n' % len(data))
+            buf.write(f'%%{len(data)}\r\n'.encode('utf-8'))
             for key in data:
                 self._write(buf, key)
                 self._write(buf, data[key])
         elif data is None:
-            buf.write('$-1\r\n')
+            buf.write('$-1\r\n'.encode('utf-8'))
         else:
             raise CommandError('Unrecognized type %s' % type(data))
 
@@ -135,7 +134,7 @@ class Server(object):
         self._kv = {}
         self._commands = self.get_commands()
 
-    def get(self, key, value):
+    def get(self, key):
         return self._kv.get(key)
 
     def set(self, key, value):
@@ -160,7 +159,7 @@ class Server(object):
         data = zip(items[::2], items[1::2])
         for key, value in data:
             self._kv[key] = value
-        return len(data)
+        return 1
 
     def get_commands(self):
         return {
@@ -185,6 +184,7 @@ class Server(object):
                 resp = self.get_response(data)
             except CommandError as exc:
                 resp = Error(exc.args[0])
+            self._protocol.write_response(socket_file, resp)
 
     def get_response(self, data):
         if not isinstance(data, list):
@@ -196,9 +196,10 @@ class Server(object):
         if not data:
             raise CommandError('Missing Command')
 
-        command = data[0].uppper()
+        command = data[0].upper()
         if command not in self._commands:
             raise CommandError(f'Unrecognized command : {command}')
+
 
         return self._commands[command](*data[1:])
 
